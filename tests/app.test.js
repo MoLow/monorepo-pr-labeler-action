@@ -1,7 +1,9 @@
 const app = require('../app')
 const helpers = require('../helpers')
+const fs = require('fs/promises')
 
 jest.mock('../helpers')
+jest.mock('fs/promises')
 
 describe('prMonorepoRepoLabeler', () => {
   afterEach(() => {
@@ -10,8 +12,8 @@ describe('prMonorepoRepoLabeler', () => {
 
   it('should label pr with 2 repos if pr has 2 monorepo repos', async () => {
     let eventData, fileData
-    helpers.readFilePromise = jest.fn(() => eventData)
-    helpers.listFiles = jest.fn(() => fileData)
+    fs.readFile = jest.fn(() => eventData)
+    helpers.listPRFiles = jest.fn(() => fileData)
     helpers.getLabel = jest.fn((repo) => repo);
     helpers.getMonorepo = jest.fn()
     helpers.addLabel = jest.fn()
@@ -42,7 +44,7 @@ describe('prMonorepoRepoLabeler', () => {
 
     await app.prMonorepoRepoLabeler()
 
-    expect(helpers.readFilePromise).toHaveBeenCalledTimes(1)
+    expect(fs.readFile).toHaveBeenCalledTimes(1)
     expect(helpers.addLabel).toHaveBeenCalledTimes(2)
     expect(helpers.addLabel.mock.calls[0][4]).toContain('repo 1')
     expect(helpers.addLabel.mock.calls[1][4]).toContain('repo 2')
@@ -50,8 +52,8 @@ describe('prMonorepoRepoLabeler', () => {
 
   it('should label pr with 1 repo if pr has 1 monorepo repo', async () => {
     let eventData, fileData
-    helpers.readFilePromise = jest.fn(() => eventData)
-    helpers.listFiles = jest.fn(() => fileData)
+    fs.readFile = jest.fn(() => eventData)
+    helpers.listPRFiles = jest.fn(() => fileData)
     helpers.getLabel = jest.fn((repo) => repo);
     helpers.getMonorepo = jest.fn()
     helpers.addLabel = jest.fn()
@@ -80,15 +82,15 @@ describe('prMonorepoRepoLabeler', () => {
 
     await app.prMonorepoRepoLabeler()
 
-    expect(helpers.readFilePromise).toHaveBeenCalledTimes(1)
+    expect(fs.readFile).toHaveBeenCalledTimes(1)
     expect(helpers.addLabel).toHaveBeenCalledTimes(1)
     expect(helpers.addLabel.mock.calls[0][4]).toContain('repo 1')
   })
 
   it('should NOT label pr if pr has 0 monorepo repos', async () => {
     let eventData, fileData
-    helpers.readFilePromise = jest.fn(() => eventData)
-    helpers.listFiles = jest.fn(() => fileData)
+    fs.readFile = jest.fn(() => eventData)
+    helpers.listPRFiles = jest.fn(() => fileData)
     helpers.getMonorepo = jest.fn()
     helpers.addLabel = jest.fn()
     eventData = `{
@@ -108,7 +110,7 @@ describe('prMonorepoRepoLabeler', () => {
 
     await app.prMonorepoRepoLabeler()
 
-    expect(helpers.readFilePromise).toHaveBeenCalledTimes(1)
+    expect(fs.readFile).toHaveBeenCalledTimes(1)
     expect(helpers.addLabel).toHaveBeenCalledTimes(0)
   })
 })

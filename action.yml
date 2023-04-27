@@ -10,8 +10,11 @@ inputs:
   separator:
     description: Seperator between prefix, label, and suffix (e.g., space)
     required: false
+outputs:
+  labels:
+    description: 'Labels that were detected'
 runs:
-  using: node16
+  using: node20
   main: dist/index.js
 branding:
   icon: 'git-merge'
